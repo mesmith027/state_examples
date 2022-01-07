@@ -1,7 +1,8 @@
 import streamlit as st
+import pandas as pd
 
 st.title("Session state examples")
-options = ["Button control", "Counter example", "Toggle example", "Link widgets", "Callbacks"]
+options = ["Button control", "Counter example", "Toggle example", "Link widgets", "Callbacks", "Dataframes"]
 
 with st.sidebar:
     page = st.radio("Pick an example", options)
@@ -120,3 +121,48 @@ elif page == options[4]:
 
         # slider 2's value will be half of slider 1's value
         st.slider("Slider 2",min_value=0.5,max_value=5.0,step=0.5, on_change=slider_two, key ="sldr_2")
+elif page == options[5]:
+    st.subheader(options[5])
+    with st.echo():
+        # initialize list of lists
+        data = {'col1': [1, 2, 3, 4], 'col2': [300, 400, 500, 600]}
+
+        # Create the pandas DataFrame
+        df = pd.DataFrame(data)
+
+        # print dataframe.
+        st.dataframe(df)
+
+        # initalize state with row
+        if "row" not in st.session_state:
+            st.session_state.row = 0
+
+        def next_row():
+            # will move value of row in state to next one
+            st.session_state.row += 1
+            return
+
+        def prev_row():
+            # mill move value of row in state to previous one
+            st.session_state.row -= 1
+            return
+
+        # create columns to hold the < and > buttons
+        col1, col2, _, _ = st.columns([0.1, 0.17, 0.1, 0.63])
+
+        # button that moves forwards
+        if st.session_state.row < len(df.index)-1:
+            col2.button(">", on_click=next_row)
+        else:
+            # if at the last row, no next button
+            col2.write("")
+
+        # button that moves backwards
+        if st.session_state.row > 0:
+            col1.button("<", on_click=prev_row)
+        else:
+            # if at the first row, no back button
+            col1.write("")
+
+        # show the current row selected 
+        st.write(df.iloc[st.session_state.row])
