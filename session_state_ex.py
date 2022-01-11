@@ -3,12 +3,14 @@ import pandas as pd
 
 st.title("Session state examples")
 options = ["Button control", "Counter example", "Toggle example", "Link widgets", "Callbacks", "Dataframes"]
+# add basics example, with stuff from state video
 
 with st.sidebar:
     page = st.radio("Pick an example", options)
 
 if page == options[0]:
-    st.subheader(options[0])
+    st.header(options[0])
+    st.subheader("Use this to nest widgets after a button press")
     with st.echo():
         # initialize flag that will track if button has been pressed
         if "open" not in st.session_state:
@@ -27,8 +29,9 @@ if page == options[0]:
             st.write("The rest of the app runs!")
             if st.checkbox("click me"):
                 st.write("🥳🥳🥳🥳🥳🥳🥳")
+
 elif page == options[1]:
-    st.subheader(options[1])
+    st.header(options[1])
     with st.echo():
         # add key:value pair to track
         if 'count' not in st.session_state:
@@ -45,7 +48,7 @@ elif page == options[1]:
         st.write(st.session_state.count)
 
 elif page == options[2]:
-    st.subheader(options[2])
+    st.header(options[2])
     with st.echo():
         # add key:value pair to track
         if 'toggle' not in st.session_state:
@@ -66,15 +69,35 @@ elif page == options[2]:
             st.write("You opened the app! 🥳🥳🥳")
         else:
             st.write("Open the app by pressing the button above 👆")
+
 elif page == options[3]:
-    st.subheader(options[3])
+    st.header(options[3])
+    st.subheader("To link a widget to a key in session state, simply use the `key` parameter")
     with st.echo():
-        st.write("work in progress")
+        # initalize the key in session states
+        if "slider" not in st.session_state:
+            st.session_state.number = 0
+            st.session_state.slider = 0
+
+        # when you create the slider, assign the `key` to be the same
+        # as the `key` you initialized already
+        st.slider("A slider", key="slider")
+
+        # display the state, "slider" value is is updated each time you change
+        # the slider value, but the "link" key does not change
+        st.write(st.session_state)
+        # linking widgets together
+
+    st.write("""Use this when you want a value in state to _always_ be up to date with the value of a widget""")
+    st.write("---")
+
+    st.subheader("To link a widget with another, use callbacks")
+
 elif page == options[4]:
-    st.subheader(options[4])
+    st.header(options[4])
     st.write("""Use a callback function when you need a variable to be updated before your script re-runs.
     This is used when you want a widget to reflect the changes before it is rendered again on the page.""")
-    st.write("Using a callback function with a button")
+    st.write("Using a callback function with a button:")
     with st.echo():
         # create callback function, this executes BEFORE the script reruns
         def button_pressed():
@@ -88,7 +111,7 @@ elif page == options[4]:
                 st.session_state.page = False
             return
 
-        # put the string name of a button in state
+        # initialize the button name and page state
         if "btn_name" not in st.session_state:
             st.session_state.btn_name = "Next"
             st.session_state.page = False
@@ -103,7 +126,9 @@ elif page == options[4]:
         else:
             st.write("Click next to move on")
     st.write("---")
-    st.write("Using a callback function with sliders")
+    st.header("Mirror widgets")
+    st.write("""Use this when you want the value of one widget to be affected by another.
+    This is useful when widgets are interdependant.""")
     with st.echo():
         #define the call back functions
         def slider_one():
@@ -117,10 +142,44 @@ elif page == options[4]:
             return
 
         # slider 1's value will be 2 times slider 2's value, and always be between 1-10
-        st.slider("Slider 1", min_value = 1,max_value = 10, on_change=slider_one, key="sldr_1")
+        st.slider("Slider 1", min_value = 1,max_value = 10,
+        on_change=slider_one, key="sldr_1")
 
         # slider 2's value will be half of slider 1's value
-        st.slider("Slider 2",min_value=0.5,max_value=5.0,step=0.5, on_change=slider_two, key ="sldr_2")
+        st.slider("Slider 2",min_value=0.5,max_value=5.0,step=0.5,
+        on_change=slider_two, key ="sldr_2")
+
+    st.write("---")
+    st.subheader("Using number inputs:")
+    with st.echo():
+        # define call back functions
+        def lbs_to_kg():
+            # will set kilogram input to convert from pounds
+            st.session_state.kg = st.session_state.lbs/2.2046
+
+        def kg_to_lbs():
+            # will set pounds to convert from kilograms
+            st.session_state.lbs = st.session_state.kg*2.2046
+
+        # set up columns to put the inputs side-by-side
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # pass lbs_to_kg function on_change parameter, use
+            # key to link number_input to session state
+            pounds = st.number_input("Pounds:", key="lbs",
+                        on_change = lbs_to_kg)
+
+        with col2:
+            # pass kg_to_lbs function on_change parameter, use
+            # key to link number_input to session state
+            kilogram = st.number_input("Kilograms:", key="kg",
+                          on_change= kg_to_lbs)
+
+        # print the session state to the app to see the values
+        st.write("weight in lbs:",st.session_state.lbs)
+        st.write("weight in kg:",st.session_state.kg)
+
 elif page == options[5]:
     st.subheader(options[5])
     with st.echo():
@@ -164,5 +223,5 @@ elif page == options[5]:
             # if at the first row, no back button
             col1.write("")
 
-        # show the current row selected 
+        # show the current row selected
         st.write(df.iloc[st.session_state.row])
