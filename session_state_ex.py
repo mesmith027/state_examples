@@ -29,7 +29,25 @@ if page == options[0]:
             st.write("The rest of the app runs!")
             if st.checkbox("click me"):
                 st.write("🥳🥳🥳🥳🥳🥳🥳")
+        
+        
+    st.write("---")
+    st.subheader("Use a button to reset another widgets value")
+    st.echo():
+        # call back function -> runs BEFORE the rest of the app
+        def reset_button():
+            st.session_state["p"] = False
+        return
 
+        #button to control reset
+        reset=st.button('Reset', on_click=reset_button)
+
+        #checkbox you want the button to un-check
+        check_box = st.checkbox("p", key='p')
+
+        #write out the current state to see that our flow works
+        st.write(st.session_state)
+        
 elif page == options[1]:
     st.header(options[1])
     with st.echo():
