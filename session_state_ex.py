@@ -33,7 +33,7 @@ if page == options[0]:
         
     st.write("---")
     st.subheader("Use a button to reset another widgets value")
-    st.echo():
+    with st.echo():
         # call back function -> runs BEFORE the rest of the app
         def reset_button():
             st.session_state["p"] = False
