@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 st.title("Session state examples")
-options = ["Button control", "Counter example", "Toggle example", "Link widgets", "Callbacks", "Dataframes"]
+options = ["Button to control app", "Counter example", "Toggle example", "Link widgets", "Callbacks", "Dataframes"]
 # add basics example, with stuff from state video
 
 with st.sidebar:
@@ -10,6 +10,12 @@ with st.sidebar:
 
 if page == options[0]:
     st.header(options[0])
+    st.write("""Many developers are looking to control the flow of their app after the press of a button.
+    Without using session state there is no way to track if a button has been pressed for multiple run
+    throughs of the app. The button returns the `True` value only once. So to create an app that is
+    controlled by the press of a button at any stage, use one of the examples below! :tada:""")
+
+
     st.subheader("Use this to nest widgets after a button press")
     with st.echo():
         # initialize flag that will track if button has been pressed
@@ -29,6 +35,36 @@ if page == options[0]:
             st.write("The rest of the app runs!")
             if st.checkbox("click me"):
                 st.write("🥳🥳🥳🥳🥳🥳🥳")
+
+    st.write("---")
+
+    st.subheader("Request a user to 'login'")
+    with st.echo():
+        # initialize state keys
+        if "credentials" not in st.session_state:
+            st.session_state["credentials"] = False
+
+        def check_credentials():
+            if (st.session_state.user == "admin") and (st.session_state["pass"] == "abc123"):
+                st.session_state["credentials"] = True
+            else:
+                st.warning("Incorrect username or password")
+            return
+
+        if not st.session_state.credentials:
+            # create a "login" screen
+            with st.form("Login"):
+                st.text_input("Username", key = "user")
+                st.text_input("Password", type="password", key ="pass")
+                st.form_submit_button("Check Credentials", on_click=check_credentials)
+
+        if st.session_state.credentials:
+            st.write("User validated")
+
+            out = st.button("logout")
+            if out:
+                st.session_state.credentials = False
+
 
 elif page == options[1]:
     st.header(options[1])
