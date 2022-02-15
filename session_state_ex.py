@@ -37,7 +37,7 @@ if page == options[0]:
         # call back function -> runs BEFORE the rest of the app
         def reset_button():
             st.session_state["p"] = False
-        return
+            return
 
         #button to control reset
         reset=st.button('Reset', on_click=reset_button)
